@@ -1,19 +1,24 @@
+
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import { Persona, ChatMessage, EvaluationReport } from "../types.ts";
 
-const API_KEY = process.env.API_KEY || '';
-
 export class GeminiService {
-  private ai: GoogleGenAI;
   private chat: Chat | null = null;
   private persona: Persona | null = null;
 
-  constructor() {
-    this.ai = new GoogleGenAI({ apiKey: API_KEY });
+  // GoogleGenAI 인스턴스를 필요할 때마다 생성하는 헬퍼 메서드
+  private getClient(): GoogleGenAI {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      throw new Error("API_KEY is not defined in the environment.");
+    }
+    return new GoogleGenAI({ apiKey });
   }
 
   async startSimulation(persona: Persona) {
     this.persona = persona;
+    const ai = this.getClient();
+    
     const systemInstruction = `
       # Role
       너는 기업의 성과 면담 시뮬레이션에 참여하는 '팀원(피평가자)'이다.
@@ -37,7 +42,7 @@ export class GeminiService {
       5. 대화 프로세스(OCDAC)를 염두에 두고 리더의 유도를 따라간다.
     `;
 
-    this.chat = this.ai.chats.create({
+    this.chat = ai.chats.create({
       model: 'gemini-3-pro-preview',
       config: {
         systemInstruction,
@@ -60,6 +65,7 @@ export class GeminiService {
   }
 
   async generateReport(history: ChatMessage[]): Promise<EvaluationReport> {
+    const ai = this.getClient();
     const prompt = `
       성과 면담 대화 내용을 FIRN 모델과 피드백 원칙에 따라 정밀 분석하여 JSON 리포트를 작성해줘.
 
@@ -84,7 +90,7 @@ export class GeminiService {
     `;
 
     try {
-      const response = await this.ai.models.generateContent({
+      const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
         contents: prompt,
         config: {
