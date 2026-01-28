@@ -5,52 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Performance Review Simulator</title>
-  
-  <!-- [Critical Path] Survival CSS: Tailwind 로딩 실패 시에도 가독성을 보장하는 핵심 스타일 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    :root {
-      --indigo-600: #4f46e5;
-      --indigo-700: #4338ca;
-      --slate-50: #f8fafc;
-      --slate-200: #e2e8f0;
-      --slate-800: #1e293b;
-      --slate-900: #0f172a;
-    }
-    body { 
-      margin: 0; 
-      padding: 0;
-      background-color: var(--slate-50); 
-      color: var(--slate-900);
-      font-family: 'Inter', -apple-system, sans-serif;
-    }
-    /* 로딩 실패 시 최소한의 레이아웃 유지 */
-    .min-h-screen { min-height: 100vh; }
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .max-w-4xl { max-width: 56rem; margin-left: auto; margin-right: auto; }
-    .bg-white { background-color: #ffffff; }
-    .bg-slate-800 { background-color: var(--slate-800); }
-    .text-white { color: #ffffff; }
-    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-    
+    body { font-family: 'Inter', sans-serif; }
     .chat-scrollbar::-webkit-scrollbar { width: 6px; }
     .chat-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .chat-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
   </style>
-
-  <!-- Tailwind CSS: 특정 버전 명시 및 다중 보안 속성 적용 -->
-  <script 
-    src="https://cdn.tailwindcss.com/3.4.1" 
-    crossorigin="anonymous" 
-    referrerpolicy="no-referrer"
-  ></script>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script 
-    src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" 
-    crossorigin="anonymous"
-  ></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -65,14 +28,5 @@
 </head>
 <body class="bg-slate-50 text-slate-900">
   <div id="root"></div>
-  
-  <!-- Tailwind 로딩 확인 스크립트 (선택 사항) -->
-  <script>
-    window.addEventListener('load', () => {
-      if (!window.tailwind) {
-        console.warn('Tailwind CDN 로드 실패. 기본 스타일(Survival CSS)을 적용합니다.');
-      }
-    });
-  </script>
 </body>
 </html>
