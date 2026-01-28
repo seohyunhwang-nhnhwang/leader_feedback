@@ -1,0 +1,7 @@
+{
+  "name": "Performance Review Simulator",
+  "description": "A professional AI-powered tool for leaders to practice performance review interviews and receive feedback on their coaching skills.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
