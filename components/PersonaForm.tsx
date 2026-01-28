@@ -6,12 +6,13 @@ interface Props {
 }
 
 const PersonaForm: React.FC<Props> = ({ onSubmit }) => {
+  // 처음 앱을 켰을 때 모든 필드를 빈 문자열로 시작
   const [form, setForm] = useState<Persona>({
-    job: 'IT 서비스 기획 및 운영',
-    title: '대리',
-    selfEvaluation: '전반적으로 지표를 달성했으나, 하반기 프로젝트 지연이 아쉬움. 하지만 운영 안정화에는 크게 기여함.',
-    disposition: '냉철하고 논리적이며, 자신의 성과에 대한 자부심이 강함. 감정적인 호소보다는 구체적인 데이터와 보상을 중시함.',
-    currentIssue: '주간 보고 누락이 잦으며, 최근 타 부서와의 협업 과정에서 독단적인 의사결정으로 인해 마찰이 발생함.'
+    job: '',
+    title: '',
+    selfEvaluation: '',
+    disposition: '',
+    currentIssue: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -42,7 +43,6 @@ const PersonaForm: React.FC<Props> = ({ onSubmit }) => {
           <label className="block text-sm font-semibold text-slate-700 mb-1">호칭 (직위)</label>
           <input
             type="text"
-            placeholder="예: 대리, 매니저, 선임 등"
             className="w-full px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             value={form.title}
             onChange={e => setForm({ ...form, title: e.target.value })}
@@ -53,7 +53,8 @@ const PersonaForm: React.FC<Props> = ({ onSubmit }) => {
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">본인 평가 요약</label>
           <textarea
-            className="w-full px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all h-20 resize-none"
+            className="w-full px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all h-20 resize-none placeholder-slate-500"
+            placeholder="예: 피평가자가 작성한 본인 평가를 AI Tool로 요약하여 넣어주세요."
             value={form.selfEvaluation}
             onChange={e => setForm({ ...form, selfEvaluation: e.target.value })}
             required
@@ -63,8 +64,8 @@ const PersonaForm: React.FC<Props> = ({ onSubmit }) => {
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">피평가자 성향 (말투, 태도, 욕구 등)</label>
           <textarea
-            className="w-full px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all h-20 resize-none"
-            placeholder="예: 수동적이지만 꼼꼼함, 인정 욕구가 강함, 도전적인 말투 등"
+            className="w-full px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all h-20 resize-none placeholder-slate-500"
+            placeholder="예: 냉철하고 논리적임, 인정 욕구가 강함, 수동적인 태도 등"
             value={form.disposition}
             onChange={e => setForm({ ...form, disposition: e.target.value })}
             required
@@ -74,8 +75,8 @@ const PersonaForm: React.FC<Props> = ({ onSubmit }) => {
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">피드백이 필요한 부분 (현재 이슈)</label>
           <textarea
-            className="w-full px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all h-20 resize-none"
-            placeholder="예: 잦은 지각, 협업 능력 부족, 성과 미달 등 구체적 이슈"
+            className="w-full px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all h-20 resize-none placeholder-slate-500"
+            placeholder="예: 주간 보고 누락이 잦으며 협업 과정에서 마찰이 발생함"
             value={form.currentIssue}
             onChange={e => setForm({ ...form, currentIssue: e.target.value })}
             required
@@ -84,7 +85,8 @@ const PersonaForm: React.FC<Props> = ({ onSubmit }) => {
 
         <button
           type="submit"
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-lg shadow-indigo-200"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-lg shadow-indigo-200 disabled:bg-slate-300"
+          disabled={!form.job || !form.title || !form.selfEvaluation || !form.disposition || !form.currentIssue}
         >
           시뮬레이션 시작하기
         </button>
