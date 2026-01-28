@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { AppPhase, Persona, ChatMessage, EvaluationReport } from './types';
-import PersonaForm from './components/PersonaForm';
-import ChatInterface from './components/ChatInterface';
-import EvaluationReportView from './components/EvaluationReportView';
-import { geminiService } from './services/geminiService';
+import { AppPhase, Persona, ChatMessage, EvaluationReport } from './types.ts';
+import PersonaForm from './components/PersonaForm.tsx';
+import ChatInterface from './components/ChatInterface.tsx';
+import EvaluationReportView from './components/EvaluationReportView.tsx';
+import { geminiService } from './services/geminiService.ts';
 
 const App: React.FC = () => {
   const [phase, setPhase] = useState<AppPhase>(AppPhase.SETUP);

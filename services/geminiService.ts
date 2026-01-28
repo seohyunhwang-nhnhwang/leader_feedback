@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type, Chat } from "@google/genai";
-import { Persona, ChatMessage, EvaluationReport } from "../types";
+import { Persona, ChatMessage, EvaluationReport } from "../types.ts";
 
 const API_KEY = process.env.API_KEY || '';
 
@@ -85,7 +85,6 @@ export class GeminiService {
     `;
 
     try {
-      // Gemini 3 Pro의 Thinking 기능을 활용하여 더 깊이 있는 분석 수행
       const response = await this.ai.models.generateContent({
         model: 'gemini-3-pro-preview',
         contents: prompt,
@@ -116,7 +115,8 @@ export class GeminiService {
         }
       });
 
-      const data = JSON.parse(response.text.trim());
+      const text = response.text || "";
+      const data = JSON.parse(text.trim());
       const totalScore = data.firn_score.F + data.firn_score.I + data.firn_score.R + data.firn_score.N + data.firn_score.Manner;
       return { ...data, totalScore };
     } catch (error) {

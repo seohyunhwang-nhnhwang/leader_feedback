@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatMessage, Persona } from '../types';
-import { geminiService } from '../services/geminiService';
+import { ChatMessage, Persona } from '../types.ts';
+import { geminiService } from '../services/geminiService.ts';
 
 interface Props {
   persona: Persona;

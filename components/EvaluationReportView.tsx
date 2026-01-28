@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { EvaluationReport } from '../types';
+import { EvaluationReport } from '../types.ts';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 
 interface Props {
@@ -174,7 +174,7 @@ const EvaluationReportView: React.FC<Props> = ({ report, onRestart }) => {
         </div>
       </div>
 
-      {/* Control Buttons - Hidden during PDF print usually handled by html2pdf automatically but good to have visible here */}
+      {/* Control Buttons */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-6 no-print">
         <button
           onClick={handleDownloadPDF}

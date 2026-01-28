@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Persona } from '../types';
+import { Persona } from '../types.ts';
 
 interface Props {
   onSubmit: (persona: Persona) => void;
