@@ -19,11 +19,11 @@ const EvaluationReportView: React.FC<Props> = ({ report, onRestart }) => {
   const reportRef = useRef<HTMLDivElement>(null);
 
   const chartData = [
-    { subject: 'Fact (사실)', A: report.firn_score.F, full: 20 },
-    { subject: 'Impact (영향)', A: report.firn_score.I, full: 20 },
-    { subject: 'Request (요청)', A: report.firn_score.R, full: 20 },
-    { subject: 'New Impact (기대)', A: report.firn_score.N, full: 20 },
-    { subject: 'Manner (매너)', A: report.firn_score.Manner, full: 20 },
+    { subject: 'Fact', A: report.firn_score.F, full: 20 },
+    { subject: 'Impact', A: report.firn_score.I, full: 20 },
+    { subject: 'Request', A: report.firn_score.R, full: 20 },
+    { subject: 'New Impact', A: report.firn_score.N, full: 20 },
+    { subject: 'Manner', A: report.firn_score.Manner, full: 20 },
   ];
 
   const handleDownloadPDF = async () => {
@@ -31,144 +31,175 @@ const EvaluationReportView: React.FC<Props> = ({ report, onRestart }) => {
 
     setIsDownloading(true);
     
+    // 버튼 등을 숨기기 위해 클래스 추가 또는 별도 엘리먼트 캡처
     const element = reportRef.current;
+    
     const opt = {
-      margin: [10, 10, 10, 10],
-      filename: `Performance_Review_Report_${new Date().toISOString().slice(0,10)}.pdf`,
+      margin: 10,
+      filename: `Feedback_Report_${new Date().getTime()}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
         useCORS: true,
         logging: false,
-        letterRendering: true
+        letterRendering: true,
+        windowWidth: 1200 // 고정 너비로 캡처하여 레이아웃 깨짐 방지
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     try {
-      // Create a clone to avoid printing the buttons and styles
-      const worker = window.html2pdf().set(opt).from(element).save();
-      await worker;
+      // Recharts 애니메이션 완료를 기다리기 위해 약간의 지연
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await window.html2pdf().set(opt).from(element).save();
     } catch (error) {
       console.error('PDF Generation failed:', error);
-      alert('PDF 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+      alert('PDF 생성 중 오류가 발생했습니다.');
     } finally {
       setIsDownloading(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12">
-      <div ref={reportRef} className="space-y-6 bg-slate-50 p-2 rounded-xl">
-        {/* Main Score Card */}
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-800">면담 코칭 리포트 (FIRN)</h2>
-              <p className="text-slate-500">행동 중심 피드백 모델 기반 역량 분석 결과입니다.</p>
+    <div className="max-w-4xl mx-auto space-y-6 pb-20">
+      <div ref={reportRef} className="bg-slate-50 rounded-2xl overflow-hidden p-1">
+        {/* Header Section */}
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Analysis Report</span>
+                <span className="text-slate-400 text-xs">{new Date().toLocaleDateString()}</span>
+              </div>
+              <h2 className="text-3xl font-black text-slate-800 tracking-tight">성과 면담 코칭 리포트</h2>
+              <p className="text-slate-500 mt-2 text-sm leading-relaxed max-w-md">
+                Gemini 3 Pro AI가 FIRN 피드백 모델에 기반하여 리더님의 면담 스킬을 분석했습니다.
+              </p>
             </div>
-            <div className="mt-4 md:mt-0 bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
-              <span className="text-sm font-bold text-indigo-600 block mb-1">Total Score</span>
-              <span className="text-4xl font-black text-indigo-700">{report.totalScore}</span>
-              <span className="text-indigo-400 font-bold ml-1">/ 100</span>
+            <div className="flex flex-col items-center bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 rounded-2xl text-white shadow-xl shadow-indigo-100 min-w-[160px]">
+              <span className="text-xs font-bold opacity-80 mb-1">총점</span>
+              <div className="flex items-baseline">
+                <span className="text-5xl font-black">{report.totalScore}</span>
+                <span className="text-indigo-200 font-bold ml-1 text-lg">/100</span>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="h-64 flex justify-center items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-10 items-center">
+            {/* Chart Area */}
+            <div className="h-72 w-full bg-slate-50/50 rounded-xl p-4">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="subject" />
-                  <PolarRadiusAxis angle={30} domain={[0, 20]} />
+                  <PolarGrid stroke="#e2e8f0" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 20]} tick={false} axisLine={false} />
                   <Radar
                     name="Score"
                     dataKey="A"
                     stroke="#4f46e5"
+                    strokeWidth={3}
                     fill="#4f46e5"
-                    fillOpacity={0.6}
+                    fillOpacity={0.5}
                   />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
 
-            <div className="space-y-4">
-              <h4 className="font-bold text-slate-700 border-l-4 border-indigo-500 pl-3">면담 요약</h4>
-              <p className="text-slate-600 text-sm leading-relaxed bg-slate-50 p-4 rounded-lg">
-                {report.summary}
-              </p>
+            {/* Summary Area */}
+            <div className="space-y-6">
+              <div>
+                <h4 className="flex items-center gap-2 text-slate-800 font-bold mb-3">
+                  <span className="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
+                  종합 요약
+                </h4>
+                <div className="bg-indigo-50/50 border border-indigo-100 p-5 rounded-xl text-slate-700 text-sm leading-relaxed">
+                  {report.summary}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Details Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-            <h5 className="font-bold text-emerald-600 flex items-center gap-2 mb-3">
+        {/* Detailed Feedback Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h5 className="font-bold text-emerald-600 flex items-center gap-2 mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              잘한 점 (Good Points)
+              핵심 강점 (Key Strengths)
             </h5>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {report.good_points.map((pt, idx) => (
-                <li key={idx} className="text-slate-600 text-sm flex gap-2">
-                  <span className="text-emerald-500 font-bold">•</span> {pt}
+                <li key={idx} className="text-slate-600 text-sm flex gap-3 items-start">
+                  <span className="mt-1 w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0"></span>
+                  <span>{pt}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-            <h5 className="font-bold text-amber-600 flex items-center gap-2 mb-3">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h5 className="font-bold text-amber-600 flex items-center gap-2 mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
-              개선점 및 제안 (Improvement)
+              개선 제안 (Action Items)
             </h5>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {report.improvement_points.map((pt, idx) => (
-                <li key={idx} className="text-slate-600 text-sm flex gap-2">
-                  <span className="text-amber-500 font-bold">•</span> {pt}
+                <li key={idx} className="text-slate-600 text-sm flex gap-3 items-start">
+                  <span className="mt-1 w-1.5 h-1.5 bg-amber-500 rounded-full shrink-0"></span>
+                  <span>{pt}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* Advice Card */}
-        <div className="bg-indigo-900 text-indigo-50 p-6 rounded-xl shadow-lg">
-          <h4 className="font-bold text-lg mb-2">리더를 위한 최종 조언</h4>
-          <p className="text-sm leading-relaxed opacity-90">{report.overall_comment}</p>
+        {/* Final Advice */}
+        <div className="mt-6 bg-slate-900 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+          <div className="relative z-10">
+            <h4 className="font-bold text-xl mb-3 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Expert's Advice
+            </h4>
+            <p className="text-indigo-100/90 leading-relaxed text-sm">
+              {report.overall_comment}
+            </p>
+          </div>
+          <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
         </div>
       </div>
 
-      {/* Control Buttons */}
-      <div className="flex justify-center items-center gap-4 pt-4">
+      {/* Control Buttons - Hidden during PDF print usually handled by html2pdf automatically but good to have visible here */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-6 no-print">
         <button
           onClick={handleDownloadPDF}
           disabled={isDownloading}
-          className={`${
-            isDownloading ? 'bg-slate-400' : 'bg-slate-800 hover:bg-slate-900'
-          } text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg flex items-center gap-2`}
+          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold transition-all shadow-lg ${
+            isDownloading ? 'bg-slate-200 text-slate-500' : 'bg-slate-800 hover:bg-slate-900 text-white'
+          }`}
         >
           {isDownloading ? (
-            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+             <svg className="animate-spin h-5 w-5 text-slate-500" viewBox="0 0 24 24">
+               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+             </svg>
           ) : (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
           )}
-          {isDownloading ? '파일 생성 중...' : '리포트 즉시 다운로드 (PDF)'}
+          {isDownloading ? 'PDF 생성 중...' : '결과 리포트 다운로드 (PDF)'}
         </button>
         <button
           onClick={onRestart}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-indigo-200"
+          className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-indigo-200"
         >
-          새로운 시뮬레이션 시작
+          새 시뮬레이션 시작
         </button>
       </div>
     </div>
