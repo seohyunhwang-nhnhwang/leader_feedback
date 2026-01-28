@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { EvaluationReport } from '../types.ts';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
