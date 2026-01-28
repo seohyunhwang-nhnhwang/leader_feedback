@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, Persona } from '../types.ts';
 import { geminiService } from '../services/geminiService.ts';
@@ -14,16 +15,18 @@ const ChatInterface: React.FC<Props> = ({ persona, onEnd }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Initial greeting from AI
     const initChat = async () => {
       setLoading(true);
       try {
         await geminiService.startSimulation(persona);
-        // Prompt explicitly asking for a simple greeting only
         const welcomeMsg = await geminiService.sendMessage("성과를 나열하지 말고, 팀장님께 면담 준비가 되었다는 인사만 짧게 건네주세요.");
         setMessages([{ role: 'model', text: welcomeMsg }]);
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
+        const errorText = error.message?.includes("quota") 
+          ? "현재 AI 사용량이 많아 잠시 대화가 어렵습니다. 1분 후 다시 시도해주세요." 
+          : "시뮬레이션을 시작하는 중 오류가 발생했습니다.";
+        setMessages([{ role: 'model', text: errorText }]);
       } finally {
         setLoading(false);
       }
@@ -53,8 +56,11 @@ const ChatInterface: React.FC<Props> = ({ persona, onEnd }) => {
     try {
       const response = await geminiService.sendMessage(input);
       setMessages(prev => [...prev, { role: 'model', text: response }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'model', text: "오류가 발생했습니다. 다시 시도해주세요." }]);
+    } catch (error: any) {
+      const errorText = error.message?.includes("quota") 
+        ? "죄송합니다. 할당량이 초과되었습니다. 잠시 후(약 1분) 다시 말씀해 주세요." 
+        : "오류가 발생했습니다. 다시 시도해주세요.";
+      setMessages(prev => [...prev, { role: 'model', text: errorText }]);
     } finally {
       setLoading(false);
     }
@@ -62,7 +68,6 @@ const ChatInterface: React.FC<Props> = ({ persona, onEnd }) => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-160px)] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-      {/* Header */}
       <div className="bg-slate-800 text-white p-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-lg">
@@ -81,7 +86,6 @@ const ChatInterface: React.FC<Props> = ({ persona, onEnd }) => {
         </button>
       </div>
 
-      {/* Chat Area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 chat-scrollbar bg-slate-50">
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -105,7 +109,6 @@ const ChatInterface: React.FC<Props> = ({ persona, onEnd }) => {
         )}
       </div>
 
-      {/* Input Area */}
       <div className="p-4 bg-white border-t border-slate-200">
         <div className="flex space-x-2">
           <input

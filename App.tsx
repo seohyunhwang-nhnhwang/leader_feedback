@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AppPhase, Persona, ChatMessage, EvaluationReport } from './types.ts';
 import PersonaForm from './components/PersonaForm.tsx';
@@ -17,14 +18,21 @@ const App: React.FC = () => {
   };
 
   const handleEndChat = async (history: ChatMessage[]) => {
+    if (history.length < 2) {
+      alert("충분한 대화가 이루어지지 않았습니다. 조금 더 면담을 진행해주세요.");
+      return;
+    }
+    
     setIsAnalyzing(true);
     try {
       const result = await geminiService.generateReport(history);
       setReport(result);
       setPhase(AppPhase.REPORT);
-    } catch (error) {
-      alert("평가 리포트를 생성하는 중 오류가 발생했습니다.");
-      setPhase(AppPhase.SETUP);
+    } catch (error: any) {
+      const errorMsg = error.message?.includes("quota")
+        ? "AI의 시간당 분석 할당량이 초과되었습니다. 잠시 후 다시 '면담 종료 및 평가'를 눌러주세요."
+        : "평가 리포트를 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.";
+      alert(errorMsg);
     } finally {
       setIsAnalyzing(false);
     }
